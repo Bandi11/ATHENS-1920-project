@@ -17,7 +17,7 @@ def savedbits(listSQ,listCompressed):
     
     for i,j in zip(listSQ,listCompressed): 
         
-        listbits.append(len(i)-len(j))
+        listbits.append(len(i)-len(j.replace(' ','')))
         
     return listbits
     

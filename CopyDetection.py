@@ -82,13 +82,13 @@ if __name__ == "__main__":
 	print(__doc__)
 	if len(sys.argv) > 1:	TestStr = ''.join(sys.argv[1:])	
 	else:
-		# TestStr = "001010000111110100110100001111101010010001"
+		TestStr = "000000000000"
 		# TestStr = "001010000111110100110100001111101010010000111000011"
 		# TestStr = "0101010101010101010101010101010101"
 		# TestStr = "0001010110111001101000010111110011011100110110010001011100110001"
 		Pi = '1001001000011111101101010100010001000010110100011000010001101001100010011000110011000101000101110000000110111'
 		# TestStr = Pi
-		TestStr = ''.join([str(random.randint(0,1)) for n in range(100) ])	# random sequence
+		#TestStr = ''.join([str(random.randint(0,1)) for n in range(100) ])	# random sequence
 		print('Usage: %s <binary string with duplicates>\n' % os.path.basename(sys.argv[0]))
 	ETestStr = Encode(TestStr)
 	print('Original:   %s - length: %d' % (TestStr, len(TestStr)))

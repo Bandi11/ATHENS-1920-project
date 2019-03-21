@@ -1,6 +1,7 @@
 import pandas as pd
 import ML_input as ML
 
+
 if __name__=='__main__':
 
     handwritten_binary = ML.handwritten_list()
@@ -13,7 +14,19 @@ if __name__=='__main__':
 
     t_d,t_v,train_d,train_v = ML.sampling(Dataframe,500)
 
-    print(t_d)
-    print(t_v)
-    print(train_d)
-    print(train_v)
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import classification_report
+
+tuned_parameters = [{'kernel': ['rbf'],
+                     'gamma': [1e-3, 1e-4],
+                     'C': [1, 10, 100, 1000]}]
+
+gnb = GaussianNB()
+y_pred = gnb.fit(train_d, train_v).predict(t_d)
+report = classification_report(t_v, y_pred)
+print(report)
+
+

@@ -84,8 +84,8 @@ def sampling(dataframe, ammount):
   test_df = pd.concat([test_generated,test_hand])
   test_vector = test_df['type']
   test_df = test_df.drop(['type'], axis=1)
-  train_generated = generated_all.drop(list(test_generated.index))
-  train_hand = generated_all.drop(list(test_hand.index))
+  train_generated = generated_all.drop(list(test_generated.index),axis=0)
+  train_hand = hand_all.drop(list(test_hand.index),axis=0)
 
   train_df = pd.concat([train_hand,train_generated])
 
