@@ -1,6 +1,9 @@
 """ML pipeline"""
 import pandas as pd
+from CopyDetection import Encode
 import random
+import countones as c
+from PrefixInt import DoublingLengthCode as Code
 import BinSeqGenerator as Bingen
 #from sklearn.naive_bayes import GaussianNB
 #from sklearn.metrics import classification_report
@@ -19,67 +22,77 @@ def handwritten_list():
             i = 12 - len(str(line))
             new_line = '0' * i + str(line)
         handwritten_binary.append(new_line)
-    return handwritten_binary
+    return list(handwritten_binary)
 
 def generated_list():
     list =[]
+    generated_binary = []
     for i in range(0,500):
         list.append(str(bin(random.getrandbits(12))[2:]))
-    return list
+    for line in list:
+        new_line = str(line)
+        if len(str(line)) < 12:
+            i = 12 - len(str(line))
+            new_line = '0' * i + str(line)
+        generated_binary.append(new_line)
+
+    return generated_binary
+
+def compressor(binary_list):
+    compressed_list = []
+
+    for element in binary_list:
+        compressed_list.append(Encode(element))
+
+    return compressed_list
+
+def all_dataframe_creator(handwritten_compressed, compressed_list2, handwritten_binary, binarylist2):
+    percent =[]
+    savedbits = []
+    category_list =[]
+    percent += c.percentageofones(handwritten_binary)
+    savedbits += c.savedbits(handwritten_binary,handwritten_compressed)
+    category_list += categorisation(handwritten_binary,'handwritten')
+
+    percent += c.percentageofones(binarylist2)
+    savedbits += c.savedbits(binarylist2, compressed_list2)
+    category_list += (categorisation(binarylist2,'generated'))
+
+    dictionary = {'percent': percent,'saved_bits': savedbits,'type':category_list}
+    Dataframe = pd.DataFrame.from_dict(dictionary)
+
+    return Dataframe
 
 
-def re_categorisation(allcommit):
+def categorisation(binary_list, type):
   cat = []
-  for index, row in allcommit.iterrows():
-    if (row['category'] == 'whatever')or(row['category'] == 'bugfix'):
-      cat.append('good')
+  for element in binary_list:
+    if type == 'handwritten':
+        cat.append('handwritten')
     else:
-      cat.append('bug')
-      
-  allcommit['cat.'] = cat
+        cat.append('generated')
+  return cat
     
-def sampling(allcommit,ammount):
+def sampling(dataframe, ammount):
   
-  bug = allcommit[allcommit['cat.']=='bug'][:ammount]
-  non_bug = allcommit[allcommit['cat.']=='good'][:ammount]
+  hand_all = dataframe[dataframe['type'] == 'handwritten'][:ammount]
+  generated_all= dataframe[dataframe['type'] == 'generated'][:ammount]
   
-  test_bug = bug.sample(frac=0.3)
-  test_nonbug = non_bug.sample(frac=0.3)
+  test_generated = generated_all.sample(frac=0.3)
+  test_hand = hand_all.sample(frac=0.3)
   
-  test_df = pd.concat([test_bug,test_nonbug])
-  test_vector = test_df['cat.']
-  test_df = test_df.drop(['cat.','category'], axis=1)
+  test_df = pd.concat([test_generated,test_hand])
+  test_vector = test_df['type']
+  test_df = test_df.drop(['type'], axis=1)
+  train_generated = generated_all.drop(list(test_generated.index))
+  train_hand = generated_all.drop(list(test_hand.index))
 
-  
-  train_bug = bug.drop(list(test_bug.index))
-  train_nonbug = non_bug.drop(list(test_nonbug.index))
-  
-  train_df = pd.concat([train_bug,train_nonbug])
-  train_vector = train_df['cat.']
-  train_df = train_df.drop(['cat.','category'], axis=1)
+  train_df = pd.concat([train_hand,train_generated])
+
+  train_vector = train_df['type']
+  train_df = train_df.drop(['type'], axis=1)
   
   return test_df, test_vector, train_df, train_vector
 
 if __name__ == '__main__':
-  DF = df_read('hive__all_Commit_Table_CSV')
-  re_categorisation(DF)
-  test_DF,test_V,train_DF,train_V = sampling(DF)
-  
-  Gauss_input_test = test_DF.drop(['author','authordate',
-                             'changed files','changed lines',
-                             'commitdate','commitdate==authordate',
-                             'committer', 'committer==author',
-                             'insertions','message',
-                                      'not test file','renamed files'], axis = 1)
-  
-  Gauss_input_train = train_DF.drop(['author','authordate',
-                             'changed files','changed lines',
-                             'commitdate','commitdate==authordate',
-                             'committer', 'committer==author',
-                             'insertions','message',
-                                      'not test file','renamed files'], axis = 1)
-  
-  
-  gnb = GaussianNB()
-  y_pred = gnb.fit(Gauss_input_train, train_V).predict(Gauss_input_test)
-  report = classification_report(test_V, y_pred)
+    pass

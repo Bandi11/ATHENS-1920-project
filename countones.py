@@ -6,8 +6,7 @@ def percentageofones(listSQ):
     for i in listSQ:
         c = i.count("1")
         p = c/12*100
-        listPer.append(p)        
-        print(listPer)
+        listPer.append(p)
     
     return listPer
 

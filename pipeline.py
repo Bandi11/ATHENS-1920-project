@@ -3,12 +3,17 @@ import ML_input as ML
 
 if __name__=='__main__':
 
+    handwritten_binary = ML.handwritten_list()
+    generated_binary = ML.generated_list()
+    generated_compressed = ML.compressor(generated_binary)
+    handwritten_compressed = ML.compressor(handwritten_binary)
 
-   handwritten_temp = ML.df_read('lifespan.csv')['toss'].head(500)
-   handwritten_binary = []
-   for line in handwritten_temp:
-       new_line=str(line)
-       if len(str(line)) < 12:
-           i=12-len(str(line))
-           new_line = '0'*i+str(line)
-       handwritten_binary.append(new_line)
+    Dataframe =ML.all_dataframe_creator(handwritten_compressed,generated_compressed,
+                                        handwritten_binary,generated_binary)
+
+    t_d,t_v,train_d,train_v = ML.sampling(Dataframe,500)
+
+    print(t_d)
+    print(t_v)
+    print(train_d)
+    print(train_v)
